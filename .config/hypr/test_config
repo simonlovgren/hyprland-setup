@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+set -e
+
+TEST_FILE="${1:-hyprland_new.lua}"
+
+if [[ ! -f "$TEST_FILE" ]]; then
+	echo "Error: File '$TEST_FILE' not found"
+	exit 1
+fi
+
+cp hyprland.lua hyprland.lua.back
+cp "$TEST_FILE" hyprland.lua
+hyprctl reload
+
+if read -r -t 5 -p "Keep config? [y/N] " answer; then
+	if [[ "$answer" =~ ^[Yy]$ ]]; then
+		exit 0
+	fi
+fi
+
+hyprctl configerrors
+
+cp hyprland.lua.back hyprland.lua
+hyprctl reload
